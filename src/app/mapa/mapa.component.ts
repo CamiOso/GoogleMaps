@@ -14,6 +14,7 @@ export class MapaComponent implements OnInit {
   @ViewChild('map', { static: true }) mapElement!: ElementRef;
   map!: google.maps.Map;
   marcadores: google.maps.Marker[] = [];
+  infoWindows: google.maps.InfoWindow[] = [];
 
 
   lugares: lugar[] = [
@@ -59,12 +60,50 @@ export class MapaComponent implements OnInit {
   }
 
 
-  agregarMarcador( lugar: lugar ) {
-    const latLng = new google.maps.LatLng( lugar.lat, lugar.lng );
+  agregarMarcador( marcador: lugar ) {
+    const latLng = new google.maps.LatLng( marcador.lat, marcador.lng );
     const marker= new google.maps.Marker({
       map: this.map,
       animation: google.maps.Animation.DROP,
-      position: latLng
+      position: latLng,
+      draggable: true
+    });
+    this.marcadores.push(marker);
+
+
+ const contenido=`<b>${marcador.nombre}</b>`;
+    const infoWindow= new google.maps.InfoWindow({
+      content: contenido
+    });
+
+    this.infoWindows.push(infoWindow);
+
+    google.maps.event.addDomListener(marker, 'click', () => {
+      this.infoWindows.forEach(infoW => infoW.close());
+
+      infoWindow.open(this.map, marker);
+    });
+
+
+    google.maps.event.addDomListener(marker, 'dblclick', (coors:any) => {
+      console.log(coors);
+      //Se destruye el marcador
+      marker.setMap(null);
+
+      //Disparar un evento de socket para borrar el marcador
+    });
+
+    google.maps.event.addDomListener(marker, 'drag', (coors:any) => {
+
+     const nuevoMarcador={
+      lat: coors.latLng.lat(),
+      lng: coors.latLng.lng(),
+      nombre:marcador.nombre
+
+     }
+
+      console.log(nuevoMarcador);
+      //Disparar un evento de socket para  mover el marcador
     });
 
 
