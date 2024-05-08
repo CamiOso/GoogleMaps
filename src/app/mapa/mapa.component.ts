@@ -53,6 +53,19 @@ export class MapaComponent implements OnInit {
     };
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapaOpciones);
+    this.map.addListener('click', (coors:any ) => {
+      const nuevoMarcador: lugar = {
+        nombre: 'Nuevo Lugar',
+        lat: coors.latLng.lat(),
+        lng: coors.latLng.lng(),
+        id:new Date().toISOString()
+      };
+
+
+      this.agregarMarcador(nuevoMarcador);
+
+      // Emitir evento de socket para agregar marcador
+    })
 
     for (const lugar  of this.lugares) {
       this.agregarMarcador(lugar);
