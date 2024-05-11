@@ -2,6 +2,7 @@
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { lugar } from '../interfaces/lugar';
+import { HttpClient } from '@angular/common/http';
 
 
 
@@ -19,28 +20,31 @@ export class MapaComponent implements OnInit {
 
   lugares: lugar[] = [
 
-
-    {
-      nombre: 'Udemy',
-      lat: 37.784679,
-      lng: -122.395936
-    },
-    {
-      nombre: 'Bahía de San Francisco',
-      lat: 37.798933,
-      lng: -122.377732
-    },
-    {
-      nombre: 'The Palace Hotel',
-      lat: 37.788578,
-      lng: -122.401745
-    }
   ];
 
-  constructor() { }
+  constructor(
+    private http: HttpClient
+
+  ) { }
 
   ngOnInit() {
-    this.cargarMapa();
+    this.http.get('http://localhost:5000/mapagooglemaps').subscribe((lugares:any) => {
+
+      this.lugares = lugares;
+      this.cargarMapa();
+    })
+
+    this.escucharSockets();
+  }
+
+  escucharSockets(){
+
+
+    //marcador-nuevo
+
+    //marcador-mover
+
+    //marcador-borrar
   }
 
   cargarMapa() {
@@ -79,7 +83,8 @@ export class MapaComponent implements OnInit {
       map: this.map,
       animation: google.maps.Animation.DROP,
       position: latLng,
-      draggable: true
+      draggable: true,
+      title: marcador.id
     });
     this.marcadores.push(marker);
 
@@ -111,7 +116,8 @@ export class MapaComponent implements OnInit {
      const nuevoMarcador={
       lat: coors.latLng.lat(),
       lng: coors.latLng.lng(),
-      nombre:marcador.nombre
+      nombre:marcador.nombre,
+      id:marker.getTitle()
 
      }
 
